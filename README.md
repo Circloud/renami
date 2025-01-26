@@ -12,10 +12,11 @@ A desktop application that uses AI to rename files based on their content.
 
 ## Usage
 
-1. Launch the application by running `main.py`
-2. Drag and drop files onto the application window or click to open file dialog
-3. Program will extract file content and call AI to get a suggested new name
-4. Review and confirm the suggested name
+1. Download the application from [Releases](https://github.com/Circloud/ai-renamer/releases/download/v1.0.0/AIRenamer.zip)
+2. **Unzip the file** and run `ai-renamer.exe` in the unzipped folder
+3. Drag and drop files onto the application window or click to open file dialog
+4. Program will extract file content and call AI to get a suggested new name
+5. Review and confirm the suggested name
 
 ## TODO
 
