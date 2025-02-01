@@ -1,0 +1,13 @@
+__pycache__/
+
+build/
+
+dist/
+
+venv/
+
+.cursorignore
+
+config.json
+
+main.spec
