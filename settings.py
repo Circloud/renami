@@ -25,12 +25,19 @@ class Settings:
         with open(self.config_file, 'r') as f:
             settings = json.load(f)
 
-            # Ensure the API base URL ends with /v1
+            # Ensure the API base URL is properly formatted
             if settings.get('api_base_url'):
                 comp_base_url = settings['api_base_url'].rstrip('/')
+                
+                # Add https:// if no protocol is specified
+                if not comp_base_url.startswith(('http://', 'https://')):
+                    comp_base_url = 'https://' + comp_base_url
+                
+                # Ensure URL ends with /v1
                 if not comp_base_url.endswith('/v1'):
                     comp_base_url += '/v1'
                 settings['api_base_url'] = comp_base_url
+                
             return settings
         
     def save(self, settings):
