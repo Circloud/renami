@@ -26,7 +26,7 @@ class FileProcessor:
         file_content = self.extract_content(file_path)
         file_extension = os.path.splitext(file_path)[1]
 
-        # Get file name suggestion from AIService
+        # Get file name suggestion or error message from AIService
         success, suggestion = self.ai_service.get_suggestion(file_content, file_extension)
         
         if not success:

@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 from tkinterdnd2 import TkinterDnD, DND_FILES
-from settings_dialog import SettingsDialog
+from settings_view import SettingsFrame
 import os
 
 class MainWindow(TkinterDnD.Tk):
@@ -13,7 +13,7 @@ class MainWindow(TkinterDnD.Tk):
         self.file_processor = file_processor
         
         # Set window title and size
-        self.title("AI Renamer")
+        self.title("Renami - AI File Renamer")
         
         # Withdraw window initially to prevent flash
         self.withdraw()
@@ -34,25 +34,37 @@ class MainWindow(TkinterDnD.Tk):
         # Supported file types
         self.supported_extensions = ('.jpg', '.jpeg', '.png', '.docx', '.pdf', '.html')
 
-        # Create main frame
-        self.main_frame = ttk.Frame(self)
-        self.main_frame.pack(fill='both', expand=True, padx=10, pady=10)
+        # Create container frame for switching between views
+        self.container = ttk.Frame(self)
+        self.container.pack(fill='both', expand=True)
 
-        # Create button frame
-        button_frame = ttk.Frame(self.main_frame)
+        # Initialize main and settings frames
+        self.main_frame = self.create_main_frame()
+        self.settings_view = None # Lazy loaded (not created until needed)
+
+        # Show main frame initially
+        self.show_main_view()
+
+    def create_main_frame(self):
+        """Create primary view frame"""
+        # Create main frame
+        main_frame = ttk.Frame(self.container)
+
+        # Create settings button frame
+        button_frame = ttk.Frame(main_frame)
         button_frame.pack(fill='x', padx=20, pady=10)
 
         # Create settings button within button frame
         self.settings_button = ttk.Button(
             button_frame,
             text="⚙️ Settings",
-            command=self.open_settings,
+            command=self.show_settings_view,
             width=15
         )
         self.settings_button.pack(side='right', padx=10)
 
         # Create drop frame
-        self.drop_frame = ttk.Frame(self.main_frame)
+        self.drop_frame = ttk.Frame(main_frame)
         self.drop_frame.pack(fill='both', expand=True, padx=20, pady=20)
 
         # Create drop zone label
@@ -76,7 +88,7 @@ class MainWindow(TkinterDnD.Tk):
 
         # Bind different drop events
         self.drop_label.bind("<Button-1>", self.on_click)
-        self.drop_label.drop_target_register(DND_FILES)
+        self.drop_label.drop_target_register(DND_FILES) # Register drop label as drop target
         self.drop_label.dnd_bind("<<Drop>>", self.on_drop)
         self.drop_label.dnd_bind("<<DragEnter>>", self.on_drag_enter)
         self.drop_label.dnd_bind("<<DragLeave>>", self.on_drag_leave)
@@ -95,15 +107,30 @@ class MainWindow(TkinterDnD.Tk):
                         anchor='center')
         
         # Create status label
-        self.status_label = ttk.Label(self.main_frame, text="Ready", font=('TkDefaultFont', 10))
-        self.status_label.pack(pady=10) 
-    
-    def open_settings(self):
-        """Show settings window"""
-        settings_dialog = SettingsDialog(self, self.settings)
+        self.status_label = ttk.Label(main_frame, text="Ready", font=('TkDefaultFont', 10))
+        self.status_label.pack(pady=10)
 
-        # Make the dialog modal
-        self.wait_window(settings_dialog)
+        return main_frame
+
+    def show_main_view(self):
+        """Show application main view"""
+        if self.settings_view:
+            self.settings_view.pack_forget()
+        self.main_frame.pack(fill='both', expand=True)
+
+    def show_settings_view(self):
+        """Show application settings view"""
+        # Hide main frame
+        self.main_frame.pack_forget()
+
+        # Lazy load settings frame if not already created
+        if not self.settings_view:
+            self.settings_view = SettingsFrame(
+                self.container,
+                self.settings,
+                on_back=self.show_main_view
+            )
+        self.settings_view.pack(fill='both', expand=True)
 
     def on_click(self, event=None):
         """Handle click event on drop zone label to open file dialog"""
@@ -128,6 +155,7 @@ class MainWindow(TkinterDnD.Tk):
 
     def on_drag_enter(self, _):
         """Handle drag enter event"""
+        # NOT WORKING AS EXPECTED, style not applied
         self.drop_label.configure(style='DropHover.TLabel')
 
     def on_drag_leave(self, _):
@@ -151,7 +179,7 @@ class MainWindow(TkinterDnD.Tk):
         # Check if API key is set
         if not self.settings.get("api_key"):
             messagebox.showerror("Error", "Please set your API key in settings before renaming files")
-            self.open_settings()
+            self.show_settings()
             return
         
         # Update status label before processing

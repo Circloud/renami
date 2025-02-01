@@ -5,12 +5,17 @@ import sys
 class Settings:
     def __init__(self):
         try:
-            # Check if the application is run as a bundle (run from exe) to better handle the config file path
+            # If the application is run as a bundle
             if getattr(sys, 'frozen', False):
-                application_dir = sys._MEIPASS # sys.MEIPASS points to the directory of the exe file
-                self.config_file = os.path.join(application_dir, 'config.json')
+                application_dir = sys._MEIPASS # sys.MEIPASS points to the working directory of the exe file
+                self.config_file = os.path.join(application_dir, 'config_template.json')
+            
+            # If the application is run as a script
             else:
-                self.config_file = 'config.json'
+                if os.path.exists('config.json'):
+                    self.config_file = 'config.json' # for personal config, NOT pushed/packaged
+                else:
+                    self.config_file = 'config_template.json' # for default config, pushed/packaged
         except Exception as e:
             print(f"Error initializing settings: {e}")
             return {}
