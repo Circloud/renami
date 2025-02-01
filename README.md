@@ -12,8 +12,8 @@ A simple and easy to use desktop application that uses LLM to rename files based
 
 ## Usage
 
-1. Download the application from [Releases](https://github.com/Circloud/renami/releases/download/v1.0.0/AIRenamer.zip)
-2. **Unzip the file** and run `ai-renamer.exe` in the unzipped folder
+1. Download the application from [Releases](https://github.com/Circloud/renami/releases/download/v1.1.0/renami-windows-portable-v1.1.0.zip)
+2. **Unzip the file** and run `Renami.exe` in the unzipped folder
 3. Click on the "Settings" button to configure the AI related settings, **currently only OpenAI is supported.**
 4. Drag and drop files onto the application window or click to open file dialog
 5. Program will extract file content and call AI to get a suggested new name
@@ -21,12 +21,12 @@ A simple and easy to use desktop application that uses LLM to rename files based
 
 ## TODO
 
+- [x] Optimize settings dialog
 - [ ] Optimize prompt for better renaming results
 - [ ] Optimize the API calling logic to reduce batch processing time
 - [ ] Add support for other AI API providers
 - [ ] Test and add support for other file types
 - [ ] Add support for customizing file naming conventions, e.g. camel case, snake case, etc.
-- [ ] Optimize settings dialog
 - [ ] Add support for specific folder monitoring and auto-rename
 
 ## Privacy Considerations
