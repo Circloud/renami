@@ -27,8 +27,10 @@ class Settings:
 
             # Ensure the API base URL ends with /v1
             if settings.get('api_base_url'):
-                if not settings['api_base_url'].endswith('/v1'):
-                    settings['api_base_url'] = settings['api_base_url'].rstrip('/') + '/v1'
+                comp_base_url = settings['api_base_url'].rstrip('/')
+                if not comp_base_url.endswith('/v1'):
+                    comp_base_url += '/v1'
+                settings['api_base_url'] = comp_base_url
             return settings
         
     def save(self, settings):
