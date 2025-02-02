@@ -10,9 +10,16 @@ class SettingsFrame(ttk.Frame):
 
         # Initialize StringVars for tracking changes
         self.setting_vars = {
-            'api_key': StringVar(value=settings.get('api_key')),
-            'api_base_url': StringVar(value=settings.get('api_base_url')),
-            'model': StringVar(value=settings.get('model'))
+            'llm_provider': StringVar(value=settings.get('llm_provider')),
+            'openai_api_key': StringVar(value=settings.get('openai_api_key')),
+            'openai_api_base_url': StringVar(value=settings.get('openai_api_base_url')),
+            'openai_model': StringVar(value=settings.get('openai_model')),
+            'deepseek_api_key': StringVar(value=settings.get('deepseek_api_key')),
+            'deepseek_api_base_url': StringVar(value=settings.get('deepseek_api_base_url')),
+            'deepseek_model': StringVar(value=settings.get('deepseek_model')),
+            'gemini_api_key': StringVar(value=settings.get('gemini_api_key')),
+            'gemini_api_base_url': StringVar(value=settings.get('gemini_api_base_url')),
+            'gemini_model': StringVar(value=settings.get('gemini_model'))
         }
         
         # Add trace to variables
@@ -89,18 +96,57 @@ class SettingsFrame(ttk.Frame):
         frame = ttk.LabelFrame(self.content_frame, text="AI Service Configuration (Currently OpenAI and DeepSeek API are supported)", padding=10)
         frame.pack(fill='x', padx=5, pady=5)
         
-        # API Key
-        ttk.Label(frame, text="API Key").pack(pady=5)
-        self.api_key_entry = ttk.Entry(frame, show='*', width=50, textvariable=self.setting_vars['api_key'])
+        # LLM Provider
+        ttk.Label(frame, text="LLM Provider").pack(pady=5)
+        self.llm_provider_combo = ttk.Combobox(frame, width=47, textvariable=self.setting_vars['llm_provider'], state='readonly')
+        self.llm_provider_combo['values'] = ('openai', 'deepseek', 'gemini')
+        self.llm_provider_combo.pack(pady=(5, 20))
+        
+        # Create frame for llm provider-specific settings
+        self.provider_settings_frame = ttk.Frame(frame)
+        self.provider_settings_frame.pack(fill='x', padx=5, pady=5)
+        
+        # Bind the combobox selection event
+        self.llm_provider_combo.bind('<<ComboboxSelected>>', self.show_provider_settings)
+        
+        # Initialize with current provider's settings
+        self.show_provider_settings()
+        
+    def show_provider_settings(self, event=None):
+        """Show the llm provider-specific settings forms based on selected provider"""
+        # Clear existing settings
+        for widget in self.provider_settings_frame.winfo_children():
+            widget.destroy()
+        
+        # Get the selected llm provider to determine which provider-specific settings to show
+        llm_provider = self.settings.get('llm_provider')
+        
+        # Create API key form
+        ttk.Label(self.provider_settings_frame, text="API Key").pack(pady=5)
+        self.api_key_entry = ttk.Entry(
+            self.provider_settings_frame, 
+            show='*', 
+            width=50, 
+            textvariable=self.setting_vars[f'{llm_provider}_api_key']
+        )
         self.api_key_entry.pack(pady=(5, 20))
         
-        # API Base URL
-        ttk.Label(frame, text="API Base URL").pack(pady=5)
-        self.api_base_url_entry = ttk.Entry(frame, width=50, textvariable=self.setting_vars['api_base_url'])
+        # Create API base URL form
+        ttk.Label(self.provider_settings_frame, text="API Base URL").pack(pady=5)
+        self.api_base_url_entry = ttk.Entry(
+            self.provider_settings_frame, 
+            width=50, 
+            textvariable=self.setting_vars[f'{llm_provider}_api_base_url']
+        )
         self.api_base_url_entry.pack(pady=(5, 20))
-
-        ttk.Label(frame, text="Model Name").pack(pady=5)
-        self.model_entry = ttk.Entry(frame, width=50, textvariable=self.setting_vars['model'])
+        
+        # Create model name form
+        ttk.Label(self.provider_settings_frame, text="Model Name").pack(pady=5)
+        self.model_entry = ttk.Entry(
+            self.provider_settings_frame, 
+            width=50, 
+            textvariable=self.setting_vars[f'{llm_provider}_model']
+        )
         self.model_entry.pack(pady=(5, 20))
 
     def create_about_section(self):

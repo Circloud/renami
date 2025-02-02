@@ -9,12 +9,17 @@ class FileProcessor:
     
     def extract_content(self, file_path):
         """Extract the content of the file using MarkItDown"""
+
+        # Get the LLM provider to use provider-specific settings
+        llm_provider = self.settings.get('llm_provider')
+        print(f"\n\n\n-----------------\n\n\n# MarkItDown LLM Provider:\n\n{llm_provider}")
+
         client = OpenAI(
-            api_key=self.settings.get('api_key'),
-            base_url=self.settings.get('api_base_url', 'https://api.openai.com/v1')
+            api_key=self.settings.get(f'{llm_provider}_api_key'),
+            base_url=self.settings.get(f'{llm_provider}_api_base_url')
         )
 
-        md = MarkItDown(llm_client=client, llm_model=self.settings.get('model', 'gpt-4o-mini'))
+        md = MarkItDown(llm_client=client, llm_model=self.settings.get(f'{llm_provider}_model'))
         result = md.convert(file_path)
 
         print(f"\n\n\n-----------------\n\n\n# File Content:\n\n{result.text_content}")

@@ -176,10 +176,11 @@ class MainWindow(TkinterDnD.Tk):
             messagebox.showerror("Error", f"Unsupported file type: {file_extension}")
             return
 
-        # Check if API key is set
-        if not self.settings.get("api_key"):
+        # Get current LLM provider and check if API key is set
+        llm_provider = self.settings.get("llm_provider")
+        if not self.settings.get(f"{llm_provider}_api_key"):
             messagebox.showerror("Error", "Please set your API key in settings before renaming files")
-            self.show_settings()
+            self.show_settings_view()
             return
         
         # Update status label before processing

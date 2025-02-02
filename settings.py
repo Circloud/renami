@@ -16,6 +16,7 @@ class Settings:
                     self.config_file = 'config.json' # for personal config, NOT pushed/packaged
                 else:
                     self.config_file = 'config_template.json' # for default config, pushed/packaged
+
         except Exception as e:
             print(f"Error initializing settings: {e}")
             return {}
@@ -24,26 +25,42 @@ class Settings:
         """Load settings from config file"""
         with open(self.config_file, 'r') as f:
             settings = json.load(f)
+            
+            # Get the current provider's base URL
+            llm_provider = settings.get('llm_provider')
+            api_base_url = settings.get(f"{llm_provider}_api_base_url")
 
-            # Ensure the API base URL is properly formatted
-            if settings.get('api_base_url'):
-                comp_base_url = settings['api_base_url'].rstrip('/')
+            # Format the API base URL if it exists
+            if api_base_url:
                 
                 # Add https:// if no protocol is specified
-                if not comp_base_url.startswith(('http://', 'https://')):
-                    comp_base_url = 'https://' + comp_base_url
+                if not api_base_url.startswith(('http://', 'https://')):
+                    api_base_url = 'https://' + api_base_url
                 
-                # Ensure URL ends with /v1
-                if not comp_base_url.endswith('/v1'):
-                    comp_base_url += '/v1'
-                settings['api_base_url'] = comp_base_url
+                # For Gemini,
+                if llm_provider == 'gemini':
+                    api_base_url = api_base_url.rstrip('/')
+
+                    # If not official endpoint, check /v1 at the end
+                    if not api_base_url == 'https://generativelanguage.googleapis.com/v1beta/openai':
+
+                        if not api_base_url.endswith('/v1'):
+                            api_base_url += '/v1'
+                        settings.update({f"{llm_provider}_api_base_url": api_base_url})          
+                
+                # For other providers, ensure URL ends with /v1
+                else: 
+                    api_base_url = api_base_url.rstrip('/')
+                    if not api_base_url.endswith('/v1'):
+                        api_base_url += '/v1'
+                    settings.update({f"{llm_provider}_api_base_url": api_base_url})
                 
             return settings
         
     def save(self, settings):
         """Save settings to config file"""
         with open(self.config_file, 'w') as f:
-            json.dump(settings, f)
+            json.dump(settings, f, indent=4)
 
     def get(self, key, default=None):
         """Get a setting value"""
