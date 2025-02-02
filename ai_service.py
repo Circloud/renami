@@ -28,6 +28,8 @@ class AIService:
                     temperature=0.7
                 )
 
+                print(f"\n\n\n-----------------\n\n\nAI Service Response: {response.choices[0].message.content.strip()}")
+
             return True, response.choices[0].message.content.strip()
             
         except Exception as e:
