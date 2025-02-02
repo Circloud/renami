@@ -22,9 +22,10 @@ A simple and easy to use desktop application that uses LLM to rename files based
 ## TODO
 
 - [x] Optimize settings dialog
+- [ ] Add support for other AI API providers
+- [ ] Support API connection test on settings view
 - [ ] Optimize prompt for better renaming results
 - [ ] Optimize the API calling logic to reduce batch processing time
-- [ ] Add support for other AI API providers
 - [ ] Test and add support for other file types
 - [ ] Add support for customizing file naming conventions, e.g. camel case, snake case, etc.
 - [ ] Add support for specific folder monitoring and auto-rename

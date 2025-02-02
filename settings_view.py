@@ -42,7 +42,7 @@ class SettingsFrame(ttk.Frame):
         
         # Initialize settings sections
         self.sections = {
-            'AI Service': self.create_api_settings,
+            'AI Service': self.create_api_service_section,
             'About': self.create_about_section
         }
 
@@ -84,9 +84,9 @@ class SettingsFrame(ttk.Frame):
         # Create new section content
         self.sections[section]() # Look up dictionary by section name and call corresponding function to create widgets
 
-    def create_api_settings(self):
+    def create_api_service_section(self):
         """Create API settings section"""
-        frame = ttk.LabelFrame(self.content_frame, text="API Configuration (Currently only OpenAI API is supported)", padding=10)
+        frame = ttk.LabelFrame(self.content_frame, text="API Configuration (Currently OpenAI and DeepSeek API are supported)", padding=10)
         frame.pack(fill='x', padx=5, pady=5)
         
         # API Key

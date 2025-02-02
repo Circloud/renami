@@ -14,7 +14,7 @@ class AIService:
                 messages = [
                     {
                         "role": "system",
-                        "content": "You are a helpful assistant that provides file naming suggestions based on the file content. When asking to rename a file, you always keep the original file extension and only output file new file name without any other text."
+                        "content": "You are a helpful assistant that provides file naming suggestions based on the file content.When asking to rename a file, you always keep the original file extension and only output file new file name without any other text."
                     },
                     {
                         "role": "user",
@@ -23,9 +23,9 @@ class AIService:
                 ]
 
                 response = client.chat.completions.create(
-                model=self.settings.get('model'),
-                messages=messages,
-                temperature=0.7
+                    model=self.settings.get('model'),
+                    messages=messages,
+                    temperature=0.7
                 )
 
             return True, response.choices[0].message.content.strip()
