@@ -12,7 +12,7 @@ class CollapsibleFrame(ttk.Frame):
         self.toggle_button = ttk.Button(
             self,
             text="▶ " + self.text,
-            width=30,
+            width=25,
             command=self.toggle
         )
         self.toggle_button.pack(pady=(5,20))
@@ -75,7 +75,7 @@ class SettingsFrame(ttk.Frame):
                 
         # Create content frame
         self.content_frame = ttk.Frame(self)
-        self.content_frame.grid(row=0, column=1, sticky='nsew', padx=5, pady=10)
+        self.content_frame.grid(row=0, column=1, sticky='nsew', padx=(0,10), pady=10)
         
         # Initialize settings sections
         self.sections = {
@@ -219,7 +219,7 @@ class SettingsFrame(ttk.Frame):
         # Version info label
         version_label = ttk.Label(
             frame,
-            text="Version: 1.1.0",
+            text="Version: 1.2.0",
             font=('Helvetica', 10)
         )
         version_label.pack(pady=(0, 10))
