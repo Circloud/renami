@@ -24,6 +24,7 @@ A simple and easy to use desktop application that uses LLM to rename files based
 - [x] Optimize settings dialog
 - [x] Refine prompt for better renaming results
 - [x] Add support for multiple LLM API providers
+- [x] Optimize UI on settings view
 - [ ] Refactor config.json to nested structure to replace current hardcoded llm providers
 - [ ] Support API connection test on settings view
 - [ ] Refactor API base URL formatting logic (move to settings_view.py)

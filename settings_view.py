@@ -1,5 +1,35 @@
 from tkinter import ttk, StringVar
 
+class CollapsibleFrame(ttk.Frame):
+    def __init__(self, parent, text=""):
+        super().__init__(parent)
+        
+        # Create variables for state
+        self.text = text
+        self.show = False
+        
+        # Create toggle button
+        self.toggle_button = ttk.Button(
+            self,
+            text="▶ " + self.text,
+            width=30,
+            command=self.toggle
+        )
+        self.toggle_button.pack(pady=(5,20))
+        
+        # Create sub frame for content
+        self.sub_frame = ttk.Frame(self)
+    
+    def toggle(self):
+        """Toggle the visibility of the sub frame"""
+        if self.show:
+            self.sub_frame.pack_forget()
+            self.toggle_button.configure(text="▶ " + self.text)
+        else:
+            self.sub_frame.pack(fill="x")
+            self.toggle_button.configure(text="▼ " + self.text)
+        self.show = not self.show
+
 class SettingsFrame(ttk.Frame):
     def __init__(self, parent, settings, on_back):
         super().__init__(parent)
@@ -36,7 +66,7 @@ class SettingsFrame(ttk.Frame):
 
         # Create sidebar frame
         self.sidebar_frame = ttk.Frame(self, style='Sidebar.TFrame')
-        self.sidebar_frame.grid(row=0, column=0, sticky='nsew')
+        self.sidebar_frame.grid(row=0, column=0, sticky='nsew', padx=5, pady=10)
 
         # Style configuration for sidebar
         style = ttk.Style()
@@ -45,7 +75,7 @@ class SettingsFrame(ttk.Frame):
                 
         # Create content frame
         self.content_frame = ttk.Frame(self)
-        self.content_frame.grid(row=0, column=1, sticky='nsew', padx=20, pady=10)
+        self.content_frame.grid(row=0, column=1, sticky='nsew', padx=5, pady=10)
         
         # Initialize settings sections
         self.sections = {
@@ -93,12 +123,17 @@ class SettingsFrame(ttk.Frame):
 
     def create_ai_service_section(self):
         """Create API settings section"""
-        frame = ttk.LabelFrame(self.content_frame, text="AI Service Configuration (Currently OpenAI and DeepSeek API are supported)", padding=10)
-        frame.pack(fill='x', padx=5, pady=5)
+        frame = ttk.LabelFrame(self.content_frame, text="AI Service Configuration")
+        frame.pack(fill='x')
         
         # LLM Provider
-        ttk.Label(frame, text="LLM Provider").pack(pady=5)
-        self.llm_provider_combo = ttk.Combobox(frame, width=47, textvariable=self.setting_vars['llm_provider'], state='readonly')
+        ttk.Label(frame, text="LLM Provider").pack(padx=(0, 10), pady=5)
+        self.llm_provider_combo = ttk.Combobox(
+            frame,
+            width=62,
+            textvariable=self.setting_vars['llm_provider'],
+            state='readonly'
+            )
         self.llm_provider_combo['values'] = ('openai', 'deepseek', 'gemini')
         self.llm_provider_combo.pack(pady=(5, 20))
         
@@ -126,25 +161,29 @@ class SettingsFrame(ttk.Frame):
         self.api_key_entry = ttk.Entry(
             self.provider_settings_frame, 
             show='*', 
-            width=50, 
+            width=65, 
             textvariable=self.setting_vars[f'{llm_provider}_api_key']
         )
         self.api_key_entry.pack(pady=(5, 20))
         
-        # Create API base URL form
-        ttk.Label(self.provider_settings_frame, text="API Base URL").pack(pady=5)
+        # Create collapsible frame for advanced settings
+        advanced_settings_frame = CollapsibleFrame(self.provider_settings_frame, text="Advanced Settings")
+        advanced_settings_frame.pack(fill="x", pady=(5, 20))
+        
+        # Create API base URL form inside collapsible frame
+        ttk.Label(advanced_settings_frame.sub_frame, text="API Base URL").pack(pady=5)
         self.api_base_url_entry = ttk.Entry(
-            self.provider_settings_frame, 
-            width=50, 
+            advanced_settings_frame.sub_frame, 
+            width=65, 
             textvariable=self.setting_vars[f'{llm_provider}_api_base_url']
         )
         self.api_base_url_entry.pack(pady=(5, 20))
         
-        # Create model name form
-        ttk.Label(self.provider_settings_frame, text="Model Name").pack(pady=5)
+        # Create model name form inside collapsible frame
+        ttk.Label(advanced_settings_frame.sub_frame, text="Model Name").pack(pady=5)
         self.model_entry = ttk.Entry(
-            self.provider_settings_frame, 
-            width=50, 
+            advanced_settings_frame.sub_frame, 
+            width=65, 
             textvariable=self.setting_vars[f'{llm_provider}_model']
         )
         self.model_entry.pack(pady=(5, 20))
@@ -152,8 +191,8 @@ class SettingsFrame(ttk.Frame):
     def create_about_section(self):
         """Create about section with improved typography and layout"""
         # Main about frame
-        frame = ttk.LabelFrame(self.content_frame, text="About", padding=(20, 10))
-        frame.pack(fill='x', padx=5, pady=5)
+        frame = ttk.LabelFrame(self.content_frame, text="About")
+        frame.pack(fill='x')
         
         # App title label
         title_label = ttk.Label(
