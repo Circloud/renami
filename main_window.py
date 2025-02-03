@@ -5,12 +5,13 @@ from settings_view import SettingsFrame
 import os
 
 class MainWindow(TkinterDnD.Tk):
-    def __init__(self, settings, file_processor):
+    def __init__(self, settings, file_processor, ai_service):
         super().__init__()
 
         # Initialize components
         self.settings = settings
         self.file_processor = file_processor
+        self.ai_service = ai_service
         
         # Set window title and size
         self.title("Renami - AI File Renamer")
@@ -128,6 +129,7 @@ class MainWindow(TkinterDnD.Tk):
             self.settings_view = SettingsFrame(
                 self.container,
                 self.settings,
+                self.ai_service,
                 on_back=self.show_main_view
             )
         self.settings_view.pack(fill='both', expand=True)

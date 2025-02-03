@@ -12,7 +12,7 @@ class FileProcessor:
 
         # Get the LLM provider to use provider-specific settings
         llm_provider = self.settings.get('llm_provider')
-        print(f"\n\n\n-----------------\n\n\n# MarkItDown LLM Provider:\n\n{llm_provider}")
+        print(f"\n\n\n-----------------\n\n\n# FileProcessor extract_content LLM Provider:\n\n{llm_provider}")
 
         client = OpenAI(
             api_key=self.settings.get(f'{llm_provider}_api_key'),
@@ -22,7 +22,7 @@ class FileProcessor:
         md = MarkItDown(llm_client=client, llm_model=self.settings.get(f'{llm_provider}_model'))
         result = md.convert(file_path)
 
-        print(f"\n\n\n-----------------\n\n\n# File Content:\n\n{result.text_content}")
+        print(f"\n\n\n-----------------\n\n\n# FileProcessor extract_content Response:\n\n{result.text_content}")
         return result.text_content
 
 

@@ -10,7 +10,7 @@ def main():
     file_processor = FileProcessor(settings, ai_service)
 
     # Initialize main window
-    app = MainWindow(settings, file_processor)
+    app = MainWindow(settings, file_processor, ai_service)
     app.mainloop()
 
 if __name__ == "__main__":

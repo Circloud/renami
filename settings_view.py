@@ -1,4 +1,4 @@
-from tkinter import ttk, StringVar
+from tkinter import ttk, StringVar, messagebox
 
 class CollapsibleFrame(ttk.Frame):
     def __init__(self, parent, text=""):
@@ -31,12 +31,13 @@ class CollapsibleFrame(ttk.Frame):
         self.show = not self.show
 
 class SettingsFrame(ttk.Frame):
-    def __init__(self, parent, settings, on_back):
+    def __init__(self, parent, settings, ai_service, on_back):
         super().__init__(parent)
 
         # Initializing components
         self.settings = settings
         self.on_back = on_back
+        self.ai_service = ai_service
 
         # Initialize StringVars for tracking changes
         self.setting_vars = {
@@ -155,17 +156,32 @@ class SettingsFrame(ttk.Frame):
         
         # Get the selected llm provider to determine which provider-specific settings to show
         llm_provider = self.settings.get('llm_provider')
-        
-        # Create API key form
+
+        # Create API key label
         ttk.Label(self.provider_settings_frame, text="API Key").pack(pady=5)
+
+        # Create frame for API key entry and verify button
+        entry_frame = ttk.Frame(self.provider_settings_frame)
+        entry_frame.pack(anchor='center', pady=(5, 20))
+
+        # Create API key entry
         self.api_key_entry = ttk.Entry(
-            self.provider_settings_frame, 
+            entry_frame, 
             show='*', 
-            width=65, 
+            width=54,
             textvariable=self.setting_vars[f'{llm_provider}_api_key']
         )
-        self.api_key_entry.pack(pady=(5, 20))
-        
+        self.api_key_entry.pack(side='left')
+
+        # Create verify button
+        verify_button = ttk.Button(
+            entry_frame,
+            text="Verify",
+            width=10,
+            command=self.verify_credentials
+        )
+        verify_button.pack(side='left', padx=(0, 0))
+
         # Create collapsible frame for advanced settings
         advanced_settings_frame = CollapsibleFrame(self.provider_settings_frame, text="Advanced Settings")
         advanced_settings_frame.pack(fill="x", pady=(5, 20))
@@ -187,6 +203,14 @@ class SettingsFrame(ttk.Frame):
             textvariable=self.setting_vars[f'{llm_provider}_model']
         )
         self.model_entry.pack(pady=(5, 20))
+
+    def verify_credentials(self):
+        """Verify the credentials for the selected LLM provider"""
+        success, message = self.ai_service.verify_credentials()
+        if success:
+            messagebox.showinfo("Success", message)
+        else:
+            messagebox.showerror("Error", message)
 
     def create_about_section(self):
         """Create about section with improved typography and layout"""
