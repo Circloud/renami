@@ -128,10 +128,10 @@ class SettingsFrame(ttk.Frame):
         frame.pack(fill='x')
         
         # LLM Provider
-        ttk.Label(frame, text="LLM Provider").pack(padx=(0, 10), pady=5)
+        ttk.Label(frame, text="LLM Provider").pack(pady=(20,5))
         self.llm_provider_combo = ttk.Combobox(
             frame,
-            width=62,
+            width=62, # Set width to 62 to match the width of the entry field
             textvariable=self.setting_vars['llm_provider'],
             state='readonly'
             )
