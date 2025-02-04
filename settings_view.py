@@ -1,4 +1,5 @@
 from tkinter import ttk, StringVar, messagebox
+import webbrowser
 
 class CollapsibleFrame(ttk.Frame):
     def __init__(self, parent, text=""):
@@ -247,3 +248,15 @@ class SettingsFrame(ttk.Frame):
             font=('Helvetica', 10)
         )
         version_label.pack(pady=(0, 10))
+
+        # GitHub link label
+        github_link = "https://github.com/Circloud/renami"
+        github_link_label = ttk.Label(
+            frame,
+            text=f"Available at {github_link}",
+            font=('Helvetica', 9),
+            foreground='#666666',
+            cursor="hand2"  # Changes cursor to hand when hovering
+        )
+        github_link_label.bind("<Button-1>", lambda e: webbrowser.open(github_link))
+        github_link_label.pack(pady=(5, 10))
