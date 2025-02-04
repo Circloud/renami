@@ -12,4 +12,4 @@ config.json
 
 main.spec
 
-test.py
+/test.*

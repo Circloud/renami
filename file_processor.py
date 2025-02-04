@@ -29,7 +29,8 @@ class FileProcessor:
         # Handle empty file error raised by MarkItDown
         except ValueError as e:
             if "Input was empty" in str(e):
-                return True, "blank file"
+                print(f"\n\n\n-----------------\n\n\n# FileProcessor extract_content Error:\n\n{str(e)}")
+                return True, "Blank file"
             
         except Exception as e:
             print(f"\n\n\n-----------------\n\n\n# FileProcessor extract_content Error:\n\n{str(e)}")

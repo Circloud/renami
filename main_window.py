@@ -33,7 +33,9 @@ class MainWindow(TkinterDnD.Tk):
         self.deiconify()
 
         # Supported file types
-        self.supported_extensions = ('.jpg', '.jpeg', '.png', '.docx', '.pdf', '.html')
+        self.supported_extensions = ('.pdf', '.docx', '.doc', '.pptx', '.ppt', '.xlsx', '.xls', '.jpg', '.jpeg', '.png', '.txt', '.md', '.json', '.csv', 'xml', '.html')
+        self.displayed_supported_extensions = ('PDF', 'PowerPoint', 'Word', 'Excel', 'Images (JPG, PNG)', 'HTML', 'Text-based formats (CSV, JSON, XML)')
+
 
         # Create container frame for switching between views
         self.container = ttk.Frame(self)
@@ -80,7 +82,7 @@ class MainWindow(TkinterDnD.Tk):
         # Create supported file types label inside drop zone
         self.supported_file_types_label = ttk.Label(
             self.drop_label,
-            text="Supported file types: " + ", ".join(self.supported_extensions),
+            text="Supported file types: " + ", ".join(self.displayed_supported_extensions),
             font=('TkDefaultFont', 8, 'italic'),
             foreground='gray',
             background='white'
