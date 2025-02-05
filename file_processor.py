@@ -1,4 +1,4 @@
-from markitdown import MarkItDown
+import markitdown
 from openai import OpenAI
 import os
 
@@ -19,18 +19,24 @@ class FileProcessor:
             base_url=self.settings.get(f'{llm_provider}_api_base_url')
         )
 
-        md = MarkItDown(llm_client=client, llm_model=self.settings.get(f'{llm_provider}_model'))
-
         try:
+            md = markitdown.MarkItDown(llm_client=client, llm_model=self.settings.get(f'{llm_provider}_model'))
+
             result = md.convert(file_path)
             print(f"\n\n\n-----------------\n\n\n# FileProcessor extract_content Response:\n\n{result.text_content}")
-            return result.text_content
+            return True, result.text_content
         
-        # Handle empty file error raised by MarkItDown
+        # Handle unsupported format error from MarkItDown
+        except markitdown.UnsupportedFormatException as e:
+            print(f"\n\n\n-----------------\n\n\n# FileProcessor extract_content Error:\n\n{str(e)}")
+            return False, f"Unsupported file format: {str(e)}"
+        
+        # Handle empty file error from MarkItDown
         except ValueError as e:
             if "Input was empty" in str(e):
                 print(f"\n\n\n-----------------\n\n\n# FileProcessor extract_content Error:\n\n{str(e)}")
                 return True, "Blank file"
+            return False, f"Unsupported file format: {str(e)}"
             
         except Exception as e:
             print(f"\n\n\n-----------------\n\n\n# FileProcessor extract_content Error:\n\n{str(e)}")
