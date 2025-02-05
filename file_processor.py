@@ -45,16 +45,20 @@ class FileProcessor:
 
     def process_file(self, file_path):
         """Process the file by calling AIService and rename the file"""
-        # Get file content and file extension
-        file_content = self.extract_content(file_path)
+        # Get file content from extract_content
+        success, file_content = self.extract_content(file_path)
+        if not success:
+            return False, file_content  # Return the error message if extraction failed
+            
         file_extension = os.path.splitext(file_path)[1]
 
         # Get file name suggestion or error message from AIService
         success, suggestion = self.ai_service.get_suggestion(file_content, file_extension)
         
         if not success:
-            return False, suggestion
+            return False, suggestion # Return the error message if AI service call failed
 
+        # Rename the file
         try:
             # Get new file path
             directory = os.path.dirname(file_path)
