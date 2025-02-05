@@ -1,4 +1,5 @@
 from tkinter import ttk, StringVar, messagebox
+from version import get_version
 import webbrowser
 
 class CollapsibleFrame(ttk.Frame):
@@ -244,7 +245,7 @@ class SettingsFrame(ttk.Frame):
         # Version info label
         version_label = ttk.Label(
             frame,
-            text="Version: 1.2.0",
+            text=f"Version: {get_version()}",
             font=('Helvetica', 10)
         )
         version_label.pack(pady=(0, 10))
