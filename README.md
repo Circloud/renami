@@ -27,12 +27,13 @@ A simple and easy to use desktop application that uses LLM to rename files based
 - [x] Better handle API call errors (e.g. excessive request delay, api key error, rate limit error, etc.)
 - [x] Support API connection test on settings view
 - [x] Test and add support for other file types
+- [ ] Introduce async function to handle API calls (both verify credentials and rename) to avoid UI freezing
+- [ ] Add LLM API input token limit to reduce cost on large files (allow customizing on settings view)
 - [ ] Add support for customizing file naming conventions, e.g. camel case, snake case, etc.
 - [ ] Add support for multi-language renaming
 - [ ] Refactor ai_service.py to make it more maintainable
 - [ ] Refactor config.json to nested structure to replace current hardcoded llm providers
 - [ ] Refactor API base URL formatting logic (move to settings_view.py)
-- [ ] Introduce async function to handle API calls (both verify credentials and rename)
 - [ ] Optimize the API calling logic to reduce batch processing time
 - [ ] Refine API calling for structured output
 - [ ] v2.0.0 plan: Add support for specific folder monitoring and auto-rename
