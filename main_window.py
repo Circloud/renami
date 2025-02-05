@@ -34,7 +34,7 @@ class MainWindow(TkinterDnD.Tk):
 
         # Supported file types
         self.supported_extensions = ('.pdf', '.docx', '.doc', '.pptx', '.ppt', '.xlsx', '.xls', '.jpg', '.jpeg', '.png', '.txt', '.md', '.json', '.csv', 'xml', '.html')
-        self.displayed_supported_extensions = ('PDF', 'PowerPoint', 'Word', 'Excel', 'Images (JPG, PNG)', 'HTML', 'Text-based formats (CSV, JSON, XML)')
+        self.displayed_supported_extensions = ('PDF', 'PowerPoint', 'Word', 'Excel', 'Images (JPG, PNG)', 'HTML', 'Text-based formats (Markdown, CSV, JSON, XML)')
 
 
         # Create container frame for switching between views
