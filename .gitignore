@@ -13,3 +13,5 @@ config.json
 main.spec
 
 /test.*
+
+/todo.md
