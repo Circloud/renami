@@ -1,5 +1,6 @@
 import openai
 from functools import wraps
+import asyncio
 
 class AIService:
     def __init__(self, settings):
@@ -25,9 +26,9 @@ class AIService:
     def _handle_openai_errors(func):
         """Decorator to handle OpenAI API errors for verify_credentials and get_suggestion"""
         @wraps(func) # Preserve the original function's metadata like function name, docstring, etc.
-        def wrapper(self, *args, **kwargs):
+        async def wrapper(self, *args, **kwargs):
             try:
-                return func(self, *args, **kwargs)
+                return await func(self, *args, **kwargs)
             except openai.AuthenticationError as e:
                 self._log(f"AIService {func.__name__} Error", e)
                 return False, "AI Service Error: Invalid API key"
@@ -49,25 +50,36 @@ class AIService:
         return wrapper
 
     @_handle_openai_errors
-    def verify_credentials(self):
+    async def verify_credentials(self):
         """Verify if the API credentials are valid by making a minimal API call"""
         llm_provider = self.settings.get('llm_provider')
-        self._log(f"AIService verify_credentials LLM Provider", llm_provider)
-        
-        with self._get_client() as client:
-            response = client.chat.completions.create(
-                model=self.settings.get(f'{llm_provider}_model'),
-                messages=[{"role": "user", "content": "test"}],
-                max_tokens=1
-            )
-            self._log(f"AIService verify_credentials Result", response.choices[0].message.content.strip())
-            return True, "Connection successful"
+
+        try:
+            async with self._get_client() as client:
+                async def make_request():
+                    response = await client.completions.create(
+                        model=self.settings.get(f"{llm_provider}_model"),
+                        messages=[{"role": "user", "content": "Test"}],
+                        max_tokens=1
+                    )
+                    return response
+
+                timeout_sec = 6
+                response = await asyncio.wait_for(make_request(), timeout=timeout_sec) # Set a forced fixed timeout
+
+            if response:
+                self._log(f"AIService verify_credentials Result", response.choices[0].message.content.strip())
+                return True, "Credentials verified successfully"
+
+        except asyncio.TimeoutError:
+            error_msg = f"API timeout after {timeout_sec} seconds"
+            self._log("AIService verify_credentials Error", error_msg)
+            return False, f"AI Service Error: {error_msg}"
 
     @_handle_openai_errors
-    def get_suggestion(self, file_content, file_extension):
+    async def get_suggestion(self, file_content, file_extension):
         """Get AI suggestion for file naming based on content"""
         llm_provider = self.settings.get('llm_provider')
-        self._log(f"AIService get_suggestion LLM Provider", llm_provider)
         
         system_prompt = """
         You are an assistant that provides file naming suggestions based on the file content.
@@ -79,16 +91,17 @@ class AIService:
 
         user_prompt = f"Please suggest a new name based on the following information: file extension: {file_extension}, file content: {file_content}"
 
-        with self._get_client() as client:
+        async with self._get_client() as client:
             messages = [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ]
             
-            response = client.chat.completions.create(
+            response = await client.chat.completions.create(
                 model=self.settings.get(f'{llm_provider}_model'),
                 messages=messages,
-                temperature=0.7
+                temperature=0.7,
+                max_tokens=50
             )
 
             suggestion = response.choices[0].message.content.strip()

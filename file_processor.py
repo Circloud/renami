@@ -8,7 +8,6 @@ class FileProcessor:
         self.ai_service = ai_service
         self.markitdown_excluded_extensions = [".md"]
     
-
     def extract_content(self, file_path):
         """Extract the content of the file using MarkItDown"""
 
@@ -58,9 +57,9 @@ class FileProcessor:
                 return False, f"Error extracting file content: {str(e)}"
 
 
-    def process_file(self, file_path):
+    async def process_file(self, file_path):
         """Process the file by calling AIService and rename the file"""
-        # Get file content from extract_content
+        # Extract file content asynchronously
         success, file_content = self.extract_content(file_path)
         if not success:
             return False, file_content  # Return the error message if extraction failed
@@ -68,7 +67,7 @@ class FileProcessor:
         file_extension = os.path.splitext(file_path)[1]
 
         # Get file name suggestion or error message from AIService
-        success, suggestion = self.ai_service.get_suggestion(file_content, file_extension)
+        success, suggestion = await self.ai_service.get_suggestion(file_content, file_extension)
         
         if not success:
             return False, suggestion # Return the error message if AI service call failed
@@ -89,7 +88,9 @@ class FileProcessor:
             
             # Rename the file
             os.rename(file_path, new_file_path)
-            return True, f"Successfully rename to {os.path.basename(new_file_path)}"
+            print(f"\n\n\n-----------------\n\n\n# FileProcessor process_file New File Path:\n\n{(os.path.basename(new_file_path))}")
+            return True, f"Rename to {os.path.basename(new_file_path)}"
         
-        except OSError as e:
+        except Exception as e:
+            print(f"\n\n\n-----------------\n\n\n# FileProcessor process_file Error:\n\n{str(e)}")
             return False, f"Failed to rename file: {str(e)}"
