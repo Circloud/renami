@@ -1,6 +1,8 @@
 from tkinter import ttk, StringVar, messagebox
+import asyncio
 from version import get_version
 import webbrowser
+import threading
 
 class CollapsibleFrame(ttk.Frame):
     def __init__(self, parent, text=""):
@@ -176,13 +178,13 @@ class SettingsFrame(ttk.Frame):
         self.api_key_entry.pack(side='left')
 
         # Create verify button
-        verify_button = ttk.Button(
+        self.verify_button = ttk.Button(
             entry_frame,
             text="Verify",
             width=10,
             command=self.verify_credentials
         )
-        verify_button.pack(side='left', padx=(0, 0))
+        self.verify_button.pack(side='left', padx=(0, 0))
 
         # Create collapsible frame for advanced settings
         advanced_settings_frame = CollapsibleFrame(self.provider_settings_frame, text="Advanced Settings")
@@ -208,7 +210,24 @@ class SettingsFrame(ttk.Frame):
 
     def verify_credentials(self):
         """Verify the credentials for the selected LLM provider"""
-        success, message = self.ai_service.verify_credentials()
+        # Disable verify button while verifying
+        self.verify_button.configure(state='disabled')
+
+        def verification_thread():
+            # Run verification in a separate thread
+            success, message = asyncio.run(self.ai_service.verify_credentials())
+            # Update the UI with verification result (After verification finished)
+            self.after(0, self._update_verification_result, success, message)
+
+        # Start the verification thread
+        threading.Thread(target=verification_thread, daemon=True).start()
+
+    def _update_verification_result(self, success, message):
+        # Check if verify button still exists (maybe destroyed when switching to another section)
+        if self.verify_button.winfo_exists():
+            self.verify_button.configure(state='normal')
+            
+        # Show messagebox with verification result
         if success:
             messagebox.showinfo("Success", message)
         else:

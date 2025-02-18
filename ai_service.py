@@ -17,7 +17,7 @@ class AIService:
         llm_provider = self.settings.get('llm_provider')
         self._log(f"AIService get_client LLM Provider", llm_provider)
         
-        return openai.OpenAI(
+        return openai.AsyncOpenAI(
             api_key=self.settings.get(f'{llm_provider}_api_key'),
             base_url=self.settings.get(f'{llm_provider}_api_base_url')
         )
@@ -57,7 +57,7 @@ class AIService:
         try:
             async with self._get_client() as client:
                 async def make_request():
-                    response = await client.completions.create(
+                    response = await client.chat.completions.create(
                         model=self.settings.get(f"{llm_provider}_model"),
                         messages=[{"role": "user", "content": "Test"}],
                         max_tokens=1

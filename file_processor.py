@@ -57,7 +57,7 @@ class FileProcessor:
                 return False, f"Error extracting file content: {str(e)}"
 
 
-    async def process_file(self, file_path):
+    async def rename_file(self, file_path):
         """Process the file by calling AIService and rename the file"""
         # Extract file content asynchronously
         success, file_content = self.extract_content(file_path)
@@ -76,7 +76,7 @@ class FileProcessor:
         try:
             # Get new file path
             directory = os.path.dirname(file_path)
-            new_file_path = os.path.join(directory, suggestion)
+            new_file_path = os.path.normpath(os.path.join(directory, suggestion))
             
             # Check if target file already exists
             if os.path.exists(new_file_path):
@@ -89,8 +89,8 @@ class FileProcessor:
             # Rename the file
             os.rename(file_path, new_file_path)
             print(f"\n\n\n-----------------\n\n\n# FileProcessor process_file New File Path:\n\n{(os.path.basename(new_file_path))}")
-            return True, f"Rename to {os.path.basename(new_file_path)}"
+            return True, os.path.basename(new_file_path)
         
         except Exception as e:
             print(f"\n\n\n-----------------\n\n\n# FileProcessor process_file Error:\n\n{str(e)}")
-            return False, f"Failed to rename file: {str(e)}"
+            return False, str(e)

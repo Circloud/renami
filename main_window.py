@@ -3,6 +3,8 @@ from tkinter import ttk, messagebox, filedialog
 from tkinterdnd2 import TkinterDnD, DND_FILES
 from settings_view import SettingsFrame
 import os
+import threading
+import asyncio
 
 class MainWindow(TkinterDnD.Tk):
     def __init__(self, settings, file_processor, ai_service):
@@ -147,15 +149,17 @@ class MainWindow(TkinterDnD.Tk):
             multiple=True
         )
 
-        for file_path in file_paths:
-            self.handle_processing(file_path)
+        if file_paths:
+            # Start processing in a separate thread
+            threading.Thread(target=self._files_processing_thread, args=(file_paths,)).start() # (file_paths,) here is a single item tuple for meeting requirements of args
 
     def on_drop(self, event):
         """Handle file drop event"""
-        # Get file paths from event
+        # Get list of file paths from drop event
         file_paths = self.tk.splitlist(event.data)
-        for file_path in file_paths:
-            self.handle_processing(file_path)
+        
+        # Start processing in a separate thread
+        threading.Thread(target=self._files_processing_thread, args=(file_paths,)).start() # (file_paths,) here is a single item tuple for meeting requirements of args
 
     def on_drag_enter(self, _):
         """Handle drag enter event"""
@@ -166,37 +170,81 @@ class MainWindow(TkinterDnD.Tk):
         """Handle drag leave event"""
         self.drop_label.configure(style='Drop.TLabel')
 
-    def handle_processing(self, file_path):
-        """Process files and update status label"""
+    def _files_processing_thread(self, file_paths):
+        """"Dedicated thread for file processing"""
+        # Process files using asyncio.run
+        results = asyncio.run(self.process_files(file_paths))
 
-        # Check if file exists
-        if not os.path.exists(file_path):
-            messagebox.showerror("Error", f"File not found: {file_path}")
-            return
+        # Update status label after processing
+        self.after(0, self._update_final_status, results, file_paths)
 
-        # Check if file type is supported
-        file_extension = os.path.splitext(file_path)[1].lower()
-        if file_extension not in self.supported_extensions:
-            messagebox.showerror("Error", f"Unsupported file type: {file_extension}")
-            return
+    def _update_final_status(self, results, file_paths):
+        """Update final processing status after all files have been processed"""
+        # Successful file count
+        success_count = 0
+        for result in results:
+            if result:
+                success_count += 1
 
-        # Get current LLM provider and check if API key is set
-        llm_provider = self.settings.get("llm_provider")
-        if not self.settings.get(f"{llm_provider}_api_key"):
-            messagebox.showerror("Error", "Please set your API key in settings before renaming files")
-            self.show_settings_view()
-            return
-        
-        # Update status label before processing
-        self.status_label.configure(text=f"Processing {os.path.basename(file_path)}...", foreground="black")
-        self.update()
+        # Total file count
+        total_count = len(file_paths)
 
-        # Call process_file method passed from file_processor
-        success, message = self.file_processor.process_file(file_path)
-
-        # Update status label based on processing result
-        if success:
-            self.status_label.configure(text=f"✅ {message}", foreground="green")
+        if success_count == total_count:
+            self.status_label.configure(text=f"✅ Successfully processed all {total_count} file(s)", foreground="green")
+        elif success_count > 0:
+            self.status_label.configure(text=f"⚠️ Processed {success_count}/{total_count} file(s) successfully", foreground="orange")
         else:
-            self.status_label.configure(text=f"❌ {message}", foreground="red")
+            self.status_label.configure(text=f"❌ Failed to process all {total_count} file(s)", foreground="red")
+
+    async def process_files(self, file_paths):
+        """Process files concurrently and update processing status"""
+        async def process_single_file(file_path):
+            # Check if file exists
+            if not os.path.exists(file_path):
+                messagebox.showerror("Error", f"File not found: {file_path}")
+                return False
+
+            # Check if file type is supported
+            file_extension = os.path.splitext(file_path)[1].lower()
+            if file_extension not in self.supported_extensions:
+                messagebox.showerror("Error", f"Unsupported file type: {file_extension}")
+                return
+
+            # Check if API key is set
+            llm_provider = self.settings.get("llm_provider")
+            if not self.settings.get(f"{llm_provider}_api_key"):
+                messagebox.showerror("Error", "Please set your API key first")
+                self.show_settings_view()
+                return
+        
+            # Update status label before processing a single file
+            self.after(0, self._update_processing_status, os.path.basename(file_path))
+
+            # Call process_file method passed from file_processor
+            success, message = await self.file_processor.rename_file(file_path)
+
+            # Update status label after processing a single file
+            self.after(0, self._update_processing_status, os.path.basename(file_path), success, message)
+
+            return success
+        
+        # Create and gather concurrent tasks
+        tasks = []
+        for file_path in file_paths:
+            task = asyncio.create_task(process_single_file(file_path))
+            tasks.append(task)
+
+        # Gather results
+        return await asyncio.gather(*tasks, return_exceptions=True)
+
+    def _update_processing_status(self, original_file_name, success=None, message=None):
+        """Update status label before processing a file"""
+        # Before processing (not received success status)
+        if success is None:
+            self.status_label.configure(text=f"Processing {original_file_name}...", foreground="black")
+        # After processing
+        elif success:
+            self.status_label.configure(text=f"✅ Renamed to: {message}", foreground="green")
+        else:
+            self.status_label.configure(text=f"❌ Failed to rename: {message}", foreground="red")
             messagebox.showerror("Error", message)
