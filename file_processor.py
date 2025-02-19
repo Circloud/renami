@@ -1,6 +1,7 @@
 import markitdown
 from openai import OpenAI
 import os
+import re
 
 class FileProcessor:
     def __init__(self, settings, ai_service):
@@ -63,7 +64,8 @@ class FileProcessor:
         success, file_content = self.extract_content(file_path)
         if not success:
             return False, file_content  # Return the error message if extraction failed
-            
+
+        # Get original file extension
         file_extension = os.path.splitext(file_path)[1]
 
         # Get file name suggestion or error message from AIService
@@ -74,9 +76,14 @@ class FileProcessor:
 
         # Rename the file
         try:
-            # Get new file path
+            # Replace invalid characters in the suggested name
+            invalid_chars = r'[<>:"/\\|?*]'  # Common invalid characters in file names
+            sanitized_name = re.sub(invalid_chars, '-', suggestion) # Replace those invalid with "-" in suggested name
+            
+            # Get new file path with the original extension
             directory = os.path.dirname(file_path)
-            new_file_path = os.path.normpath(os.path.join(directory, suggestion))
+            new_file_name = f"{sanitized_name}{file_extension}"  # Append original extension
+            new_file_path = os.path.join(directory, new_file_name)
             
             # Check if target file already exists
             if os.path.exists(new_file_path):

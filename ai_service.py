@@ -83,13 +83,14 @@ class AIService:
         
         system_prompt = """
         You are an assistant that provides file naming suggestions based on the file content.
-        When asked to rename a file, you always follow the rules below:
-        1. Keep the original file extension
-        2. Only output file new file name without any other text
+        When asked to rename a file, you always adhere to the following rules:
+        1. ONLY output the suggested new file name without any additional text.
+        2. Do not add any file extension to the new file name
         3. Since the content of the parsed files lacks a hierarchical structure, please make sure to come up with a file name that takes all the file content into account.
+        4. Avoid using any invalid characters in new file name. Using spaces is suggested.
         """
 
-        user_prompt = f"Please suggest a new name based on the following information: file extension: {file_extension}, file content: {file_content}"
+        user_prompt = f"Please suggest a new file name (without extension) based on the following file content: {file_content}"
 
         async with self._get_client() as client:
             messages = [
