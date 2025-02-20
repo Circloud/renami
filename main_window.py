@@ -203,6 +203,9 @@ class MainWindow(TkinterDnD.Tk):
             self.drop_label.configure(foreground='gray')
         ])
         
+        # Disable settings button
+        self.settings_button.configure(state='disabled')
+
         # Process files using asyncio.run
         results = asyncio.run(self.process_files(file_paths)) # blocking call - will wait until the process is finished before moving to the next line
 
@@ -217,6 +220,9 @@ class MainWindow(TkinterDnD.Tk):
             self.drop_label.configure(text="Drag and drop files here\nor click to select files"),
             self.drop_label.configure(foreground='black')
         ])
+
+        # Restore settings button
+        self.settings_button.configure(state='normal')
 
     def _update_final_status(self, results, file_paths):
         """Update final processing status after all files have been processed"""
