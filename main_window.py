@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
+from tkinter import ttk, filedialog, messagebox
 from tkinterdnd2 import TkinterDnD, DND_FILES
 from settings_view import SettingsFrame
 import os
@@ -14,6 +14,9 @@ class MainWindow(TkinterDnD.Tk):
         self.settings = settings
         self.file_processor = file_processor
         self.ai_service = ai_service
+        
+        # Add processing status flag
+        self.is_processing = False
         
         # Set window title and size
         self.title("Renami - AI File Renamer")
@@ -140,6 +143,11 @@ class MainWindow(TkinterDnD.Tk):
 
     def on_click(self, event=None):
         """Handle click event on drop zone label to open file dialog"""
+        # Ignore click if already processing
+        if self.is_processing:
+            self._flash_label_warning(self.drop_label)
+            return
+
         # Open file dialog to select files
         file_paths = filedialog.askopenfilename(
             title="Select files to rename",
@@ -155,6 +163,11 @@ class MainWindow(TkinterDnD.Tk):
 
     def on_drop(self, event):
         """Handle file drop event"""
+        # Ignore drop if already processing
+        if self.is_processing:
+            self._flash_label_warning(self.drop_label)
+            return
+
         # Get list of file paths from drop event
         file_paths = self.tk.splitlist(event.data)
         
@@ -170,13 +183,40 @@ class MainWindow(TkinterDnD.Tk):
         """Handle drag leave event"""
         self.drop_label.configure(style='Drop.TLabel')
 
+    def _flash_label_warning(self, label, miliseconds=500):
+        """Flash the drop label red to indicate processing is in progress"""
+        # Get current label color
+        current_color = label.cget('foreground')
+        # Change label color to red
+        label.configure(foreground='red')
+        # Schedule return to original color for flash effect
+        self.after(miliseconds, lambda: label.configure(foreground=current_color))
+
     def _files_processing_thread(self, file_paths):
         """"Dedicated thread for file processing"""
-        # Process files using asyncio.run
-        results = asyncio.run(self.process_files(file_paths))
+        # Set processing flag
+        self.is_processing = True
 
-        # Update status label after processing
+        # Update drop label
+        self.after(0, lambda: [
+            self.drop_label.configure(text="⏳ Processing files...\nPlease wait until finished"),
+            self.drop_label.configure(foreground='gray')
+        ])
+        
+        # Process files using asyncio.run
+        results = asyncio.run(self.process_files(file_paths)) # blocking call - will wait until the process is finished before moving to the next line
+
+        # Update status label AFTER processing
         self.after(0, self._update_final_status, results, file_paths)
+        
+        # Reset processing flag
+        self.is_processing = False
+
+        # Restore drop label
+        self.after(0, lambda: [
+            self.drop_label.configure(text="Drag and drop files here\nor click to select files"),
+            self.drop_label.configure(foreground='black')
+        ])
 
     def _update_final_status(self, results, file_paths):
         """Update final processing status after all files have been processed"""
@@ -208,14 +248,15 @@ class MainWindow(TkinterDnD.Tk):
             file_extension = os.path.splitext(file_path)[1].lower()
             if file_extension not in self.supported_extensions:
                 messagebox.showerror("Error", f"Unsupported file type: {file_extension}")
-                return
+                self._flash_label_warning(self.supported_file_types_label, miliseconds=2000)
+                return False
 
             # Check if API key is set
             llm_provider = self.settings.get("llm_provider")
             if not self.settings.get(f"{llm_provider}_api_key"):
                 messagebox.showerror("Error", "Please set your API key first")
                 self.show_settings_view()
-                return
+                return False
         
             # Update status label before processing a single file
             self.after(0, self._update_processing_status, os.path.basename(file_path))
@@ -235,7 +276,7 @@ class MainWindow(TkinterDnD.Tk):
             tasks.append(task)
 
         # Gather results
-        return await asyncio.gather(*tasks, return_exceptions=True)
+        return await asyncio.gather(*tasks, return_exceptions=True) # return_exceptions=True will not stop the process even if one of the tasks raises an exception
 
     def _update_processing_status(self, original_file_name, success=None, message=None):
         """Update status label before processing a file"""
