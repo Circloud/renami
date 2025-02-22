@@ -24,9 +24,6 @@ class Settings:
                         "openai_api_key": "",
                         "openai_api_base_url": "https://api.openai.com/v1",
                         "openai_model": "gpt-4o-mini",
-                        "deepseek_api_key": "",
-                        "deepseek_api_base_url": "https://api.deepseek.com/v1",
-                        "deepseek_model": "deepseek-chat",
                         "gemini_api_key": "",
                         "gemini_api_base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
                         "gemini_model": "gemini-2.0-flash-lite-preview-02-05",
@@ -65,9 +62,6 @@ class Settings:
                     api_base_url = 'https://' + api_base_url
                 
                 if llm_provider == 'openai':
-                    api_base_url = api_base_url.rstrip('/')
-                
-                if llm_provider == 'deepseek':
                     api_base_url = api_base_url.rstrip('/')
                 
                 if llm_provider == 'gemini':

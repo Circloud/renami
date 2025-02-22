@@ -49,9 +49,6 @@ class SettingsFrame(ttk.Frame):
             'openai_api_key': StringVar(value=settings.get('openai_api_key')),
             'openai_api_base_url': StringVar(value=settings.get('openai_api_base_url')),
             'openai_model': StringVar(value=settings.get('openai_model')),
-            'deepseek_api_key': StringVar(value=settings.get('deepseek_api_key')),
-            'deepseek_api_base_url': StringVar(value=settings.get('deepseek_api_base_url')),
-            'deepseek_model': StringVar(value=settings.get('deepseek_model')),
             'gemini_api_key': StringVar(value=settings.get('gemini_api_key')),
             'gemini_api_base_url': StringVar(value=settings.get('gemini_api_base_url')),
             'gemini_model': StringVar(value=settings.get('gemini_model')),
@@ -139,7 +136,6 @@ class SettingsFrame(ttk.Frame):
         # Internal-display name mapping for llm providers
         self.llm_provider_name_map = {
             'openai': 'OpenAI Official',
-            'deepseek': 'DeepSeek Official',
             'gemini': 'Google Gemini Official',
             'openai_compatible': 'OpenAI Compatible (Most Third-party Services)'
         }
