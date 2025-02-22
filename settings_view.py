@@ -127,31 +127,53 @@ class SettingsFrame(ttk.Frame):
         self.sections[section]() # Look up dictionary by section name and call corresponding function to create widgets
 
     def create_ai_service_section(self):
-        """Create API settings section"""
+        """Create API settings section for configuring LLM providers"""
+        # Main container frame
         frame = ttk.LabelFrame(self.content_frame, text="AI Service Configuration")
         frame.pack(fill='x')
-        
-        # LLM Provider
+
+        # ===== LLM Provider Setting =====
+        # Internal-display name mapping for llm providers
+        self.llm_provider_name_map = {
+            'openai': 'OpenAI Official',
+            'deepseek': 'DeepSeek Official',
+            'gemini': 'Google Gemini Official'
+        }
+
+        # Create LLM provider combobox
         ttk.Label(frame, text="LLM Provider").pack(pady=(20,5))
         self.llm_provider_combo = ttk.Combobox(
             frame,
-            width=62, # Set width to 62 to match the width of the entry field
-            textvariable=self.setting_vars['llm_provider'],
+            width=62,
             state='readonly'
-            )
-        self.llm_provider_combo['values'] = ('openai', 'deepseek', 'gemini')
+        )
+        # Show display name in combobox
+        self.llm_provider_combo['values'] = [self.llm_provider_name_map[name] for name in self.llm_provider_name_map]
         self.llm_provider_combo.pack(pady=(5, 20))
-        
-        # Create frame for llm provider-specific settings
+
+        # Initialize combobox with display name of current provider
+        current_internal_name = self.setting_vars['llm_provider'].get()
+        self.llm_provider_combo.set(self.llm_provider_name_map[current_internal_name])
+
+        # ===== Provider-specific Settings =====
+        # Container for provider-specific settings
         self.provider_settings_frame = ttk.Frame(frame)
-        self.provider_settings_frame.pack(fill='x', padx=5, pady=5)
-        
-        # Bind the combobox selection event
-        self.llm_provider_combo.bind('<<ComboboxSelected>>', self.show_provider_settings)
-        
-        # Initialize with current provider's settings
+        self.provider_settings_frame.pack(fill='x')
+
+        def on_provider_selected(event):
+            # Map display name to internal name
+            selected_display_name = self.llm_provider_combo.get()
+            selected_internal_name = next(k for k, v in self.llm_provider_name_map.items() if v == selected_display_name)
+            # Store internal name to StringVar
+            self.setting_vars['llm_provider'].set(selected_internal_name)
+            # Update to provider-specific settings
+            self.show_provider_settings()
+
+        # Initialize default provider-specific settings
         self.show_provider_settings()
-        
+        # Bind combobox selection event
+        self.llm_provider_combo.bind('<<ComboboxSelected>>', on_provider_selected)
+
     def show_provider_settings(self, event=None):
         """Show the llm provider-specific settings forms based on selected provider"""
         # Clear existing settings
