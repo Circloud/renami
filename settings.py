@@ -29,7 +29,10 @@ class Settings:
                         "deepseek_model": "deepseek-chat",
                         "gemini_api_key": "",
                         "gemini_api_base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
-                        "gemini_model": "gemini-2.0-flash-exp"
+                        "gemini_model": "gemini-2.0-flash-lite-preview-02-05",
+                        "openai_compatible_api_key": "",
+                        "openai_compatible_api_base_url": "",
+                        "openai_compatible_model": ""
                     }
                     with open(self.config_file, 'w') as f:
                         json.dump(config_template, f, indent=4)
@@ -61,23 +64,17 @@ class Settings:
                 if not api_base_url.startswith(('http://', 'https://')):
                     api_base_url = 'https://' + api_base_url
                 
-                # For Gemini,
+                if llm_provider == 'openai':
+                    api_base_url = api_base_url.rstrip('/')
+                
+                if llm_provider == 'deepseek':
+                    api_base_url = api_base_url.rstrip('/')
+                
                 if llm_provider == 'gemini':
                     api_base_url = api_base_url.rstrip('/')
-
-                    # If not official endpoint, check /v1 at the end
-                    if not api_base_url == 'https://generativelanguage.googleapis.com/v1beta/openai':
-
-                        if not api_base_url.endswith('/v1'):
-                            api_base_url += '/v1'
-                        settings.update({f"{llm_provider}_api_base_url": api_base_url})          
                 
-                # For other providers, ensure URL ends with /v1
-                else: 
+                if llm_provider == 'openai_compatible':
                     api_base_url = api_base_url.rstrip('/')
-                    if not api_base_url.endswith('/v1'):
-                        api_base_url += '/v1'
-                    settings.update({f"{llm_provider}_api_base_url": api_base_url})
                 
             return settings
         

@@ -54,7 +54,10 @@ class SettingsFrame(ttk.Frame):
             'deepseek_model': StringVar(value=settings.get('deepseek_model')),
             'gemini_api_key': StringVar(value=settings.get('gemini_api_key')),
             'gemini_api_base_url': StringVar(value=settings.get('gemini_api_base_url')),
-            'gemini_model': StringVar(value=settings.get('gemini_model'))
+            'gemini_model': StringVar(value=settings.get('gemini_model')),
+            'openai_compatible_api_key': StringVar(value=settings.get('openai_compatible_api_key')),
+            'openai_compatible_api_base_url': StringVar(value=settings.get('openai_compatible_api_base_url')),
+            'openai_compatible_model': StringVar(value=settings.get('openai_compatible_model'))
         }
         
         # Add trace to variables
@@ -137,7 +140,8 @@ class SettingsFrame(ttk.Frame):
         self.llm_provider_name_map = {
             'openai': 'OpenAI Official',
             'deepseek': 'DeepSeek Official',
-            'gemini': 'Google Gemini Official'
+            'gemini': 'Google Gemini Official',
+            'openai_compatible': 'OpenAI Compatible (Most Third-party Services)'
         }
 
         # Create LLM provider combobox

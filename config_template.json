@@ -1,12 +1,15 @@
 {
     "llm_provider": "openai",
     "openai_api_key": "",
-    "openai_api_base_url": "https://api.openai.com/v1",
+    "openai_api_base_url": "https://api.openai.com/v1/",
     "openai_model": "gpt-4o-mini",
     "deepseek_api_key": "",
-    "deepseek_api_base_url": "https://api.deepseek.com/v1",
+    "deepseek_api_base_url": "https://api.deepseek.com/v1/",
     "deepseek_model": "deepseek-chat",
     "gemini_api_key": "",
-    "gemini_api_base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
-    "gemini_model": "gemini-2.0-flash-exp"
+    "gemini_api_base_url": "https://generativelanguage.googleapis.com/v1beta/openai/",
+    "gemini_model": "gemini-2.0-flash-lite-preview-02-05",
+    "openai_compatible_api_key": "",
+    "openai_compatible_api_base_url": "",
+    "openai_compatible_model": ""
 }

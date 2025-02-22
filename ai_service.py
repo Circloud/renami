@@ -47,6 +47,9 @@ class AIService:
             except openai.APIError as e:
                 self._log(f"AIService {func.__name__} Error", e)
                 return False, "AI Service Error: Unexpected error"
+            except Exception as e:
+                self._log(f"AIService {func.__name__} Error", e)
+                return False, "AI Service Error: Unexpected error"
         return wrapper
 
     @_handle_openai_errors
