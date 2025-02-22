@@ -52,6 +52,9 @@ class SettingsFrame(ttk.Frame):
             'gemini_api_key': StringVar(value=settings.get('gemini_api_key')),
             'gemini_api_base_url': StringVar(value=settings.get('gemini_api_base_url')),
             'gemini_model': StringVar(value=settings.get('gemini_model')),
+            'doubao_api_key': StringVar(value=settings.get('doubao_api_key')),
+            'doubao_api_base_url': StringVar(value=settings.get('doubao_api_base_url')),
+            'doubao_model': StringVar(value=settings.get('doubao_model')),
             'openai_compatible_api_key': StringVar(value=settings.get('openai_compatible_api_key')),
             'openai_compatible_api_base_url': StringVar(value=settings.get('openai_compatible_api_base_url')),
             'openai_compatible_model': StringVar(value=settings.get('openai_compatible_model'))
@@ -137,6 +140,7 @@ class SettingsFrame(ttk.Frame):
         self.llm_provider_name_map = {
             'openai': 'OpenAI Official',
             'gemini': 'Google Gemini Official',
+            'doubao': 'ByteDance Doubao Official',
             'openai_compatible': 'OpenAI Compatible (Most Third-party Services)'
         }
 

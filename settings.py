@@ -27,6 +27,9 @@ class Settings:
                         "gemini_api_key": "",
                         "gemini_api_base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
                         "gemini_model": "gemini-2.0-flash-lite-preview-02-05",
+                        "doubao_api_key": "",
+                        "doubao_api_base_url": "https://ark.cn-beijing.volces.com/api/v3/",
+                        "doubao_model": "doubao-1-5-vision-pro-32k-250115",
                         "openai_compatible_api_key": "",
                         "openai_compatible_api_base_url": "",
                         "openai_compatible_model": ""
@@ -67,6 +70,9 @@ class Settings:
                 if llm_provider == 'gemini':
                     api_base_url = api_base_url.rstrip('/')
                 
+                if llm_provider == 'doubao':
+                    api_base_url = api_base_url.rstrip('/')
+
                 if llm_provider == 'openai_compatible':
                     api_base_url = api_base_url.rstrip('/')
                 
