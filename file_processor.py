@@ -76,9 +76,9 @@ class FileProcessor:
 
         # Rename the file
         try:
-            # Replace invalid characters in the suggested name
+            # Remove invalid characters from the suggested name
             invalid_chars = r'[<>:"/\\|?*]'  # Common invalid characters in file names
-            sanitized_name = re.sub(invalid_chars, '-', suggestion) # Replace those invalid with "-" in suggested name
+            sanitized_name = re.sub(invalid_chars, '', suggestion)  # Remove invalid characters from suggested name
             
             # Get new file path with the original extension
             directory = os.path.dirname(file_path)
