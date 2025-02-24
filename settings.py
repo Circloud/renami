@@ -33,7 +33,8 @@ class Settings:
                         "openai_compatible_api_key": "",
                         "openai_compatible_api_base_url": "",
                         "openai_compatible_model": "",
-                        "naming_language": "en"
+                        "naming_language": "en",
+                        "naming_convention": "with-spaces"
                     }
                     with open(self.config_file, 'w') as f:
                         json.dump(config_template, f, indent=4)

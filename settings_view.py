@@ -58,7 +58,8 @@ class SettingsFrame(ttk.Frame):
             'openai_compatible_api_key': StringVar(value=settings.get('openai_compatible_api_key')),
             'openai_compatible_api_base_url': StringVar(value=settings.get('openai_compatible_api_base_url')),
             'openai_compatible_model': StringVar(value=settings.get('openai_compatible_model')),
-            'naming_language': StringVar(value=settings.get('naming_language'))
+            'naming_language': StringVar(value=settings.get('naming_language')),
+            'naming_convention': StringVar(value=settings.get('naming_convention'))
         }
         
         # Add trace to variables
@@ -176,7 +177,7 @@ class SettingsFrame(ttk.Frame):
             selected_internal_name = next(k for k, v in self.llm_provider_name_map.items() if v == selected_display_name)
             # Store internal name to StringVar
             self.setting_vars['llm_provider'].set(selected_internal_name)
-            # Update to provider-specific settings
+            # Update provider-specific settings
             self.show_provider_settings()
 
         # Update StringVar and show provider-specific settings when combobox is changed
@@ -269,6 +270,7 @@ class SettingsFrame(ttk.Frame):
         frame = ttk.LabelFrame(self.content_frame, text="Naming Rules")
         frame.pack(fill='x')
 
+        # ===== Naming Language Setting =====
         # Create file naming language label
         ttk.Label(frame, text="File Naming Language").pack(pady=(20,5))
 
@@ -293,15 +295,73 @@ class SettingsFrame(ttk.Frame):
         current_internal_name = self.setting_vars['naming_language'].get()
         self.naming_language_combo.set(self.naming_language_name_map[current_internal_name])
 
+        # ===== Naming Language-specific Settings =====
+        # Create frame for naming language-specific settings
+        self.naming_language_settings_frame = ttk.Frame(frame)
+        
         def on_naming_language_selected(event):
             # Map display name to internal name
             selected_display_name = self.naming_language_combo.get()
             selected_internal_name = next(k for k, v in self.naming_language_name_map.items() if v == selected_display_name)
             # Store internal name to StringVar
             self.setting_vars['naming_language'].set(selected_internal_name)
+            # Update naming language-specific settings
+            self.show_naming_language_settings(selected_internal_name)
         
         # Update StringVar when combobox is changed
         self.naming_language_combo.bind('<<ComboboxSelected>>', on_naming_language_selected)
+
+        # Show current naming language settings
+        self.show_naming_language_settings(self.setting_vars['naming_language'].get())
+
+    def show_naming_language_settings(self, naming_language):
+        """Show the naming language-specific settings frame based on selected naming language"""
+        # Clear existing settings
+        for widget in self.naming_language_settings_frame.winfo_children():
+            widget.destroy()
+
+        if naming_language == 'en':
+            # Show the language-specific settings frame
+            self.naming_language_settings_frame.pack(fill='x')
+            
+            self.naming_convention_map = {
+                "with-spaces": "With Spaces",
+                "pascal-case": "PascalCase",
+                "camel-case": "camelCase",
+                "snake-case": "snake_case",
+                "kebab-case": "kebab-case",
+                "not-applicable": "N/A"
+            }
+
+            # Create combobox for naming convention
+            ttk.Label(self.naming_language_settings_frame, text="Naming Convention").pack(pady=5)
+            self.naming_convention_combo = ttk.Combobox(
+                self.naming_language_settings_frame,
+                width=62,
+                state='readonly'
+            )
+
+            # Show display name in combobox
+            self.naming_convention_combo['values'] = list(self.naming_convention_map.values())
+            self.naming_convention_combo.pack(pady=(5,20))
+            
+            # Initialize combobox with display name from config
+            current_internal_name = self.setting_vars['naming_convention'].get()
+            self.naming_convention_combo.set(self.naming_convention_map[current_internal_name])
+
+            # Update StringVar when combobox is changed
+            def on_naming_convention_selected(event):
+                # Map display name to internal name
+                selected_display_name = self.naming_convention_combo.get()
+                selected_internal_name = next(k for k, v in self.naming_convention_map.items() if v == selected_display_name)
+                # Store internal name to StringVar
+                self.setting_vars['naming_convention'].set(selected_internal_name)
+
+            self.naming_convention_combo.bind('<<ComboboxSelected>>', on_naming_convention_selected)
+            
+        elif naming_language == 'zh-Hans':
+            # Hide language-specific settings frame
+            self.naming_language_settings_frame.pack_forget()
 
     def create_about_section(self):
         """Create about section to show general information about the application"""

@@ -12,5 +12,6 @@
     "openai_compatible_api_key": "",
     "openai_compatible_api_base_url": "",
     "openai_compatible_model": "",
-    "naming_language": "en"
+    "naming_language": "en",
+    "naming_convention": "with-spaces"
 }
