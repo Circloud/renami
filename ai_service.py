@@ -83,14 +83,16 @@ class AIService:
     async def get_suggestion(self, file_content, file_extension):
         """Get AI suggestion for file naming based on content"""
         llm_provider = self.settings.get('llm_provider')
-        
-        system_prompt = """
+        naming_language = self.settings.get('naming_language')
+
+        system_prompt = f"""
         You are an assistant that provides file naming suggestions based on the file content.
         When asked to rename a file, you always adhere to the following rules:
         1. ONLY output the suggested new file name without any additional text.
         2. Do not add any file extension to the new file name
         3. Since the content of the parsed files lacks a hierarchical structure, please make sure to come up with a file name that takes all the file content into account.
-        4. Avoid using any invalid characters in new file name. Using spaces is suggested.
+        4. Avoid using any invalid characters in new file name.
+        5. Use {naming_language} for naming the file.
         """
 
         user_prompt = f"Please suggest a new file name (without extension) based on the following file content: {file_content}"

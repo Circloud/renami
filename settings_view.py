@@ -57,7 +57,8 @@ class SettingsFrame(ttk.Frame):
             'doubao_model': StringVar(value=settings.get('doubao_model')),
             'openai_compatible_api_key': StringVar(value=settings.get('openai_compatible_api_key')),
             'openai_compatible_api_base_url': StringVar(value=settings.get('openai_compatible_api_base_url')),
-            'openai_compatible_model': StringVar(value=settings.get('openai_compatible_model'))
+            'openai_compatible_model': StringVar(value=settings.get('openai_compatible_model')),
+            'naming_language': StringVar(value=settings.get('naming_language'))
         }
         
         # Add trace to variables
@@ -88,6 +89,7 @@ class SettingsFrame(ttk.Frame):
         # Initialize settings sections
         self.sections = {
             'AI Service': self.create_ai_service_section,
+            'Naming Rules': self.create_naming_rules_section,
             'About': self.create_about_section
         }
 
@@ -151,11 +153,12 @@ class SettingsFrame(ttk.Frame):
             width=62,
             state='readonly'
         )
+
         # Show display name in combobox
         self.llm_provider_combo['values'] = [self.llm_provider_name_map[name] for name in self.llm_provider_name_map]
         self.llm_provider_combo.pack(pady=(5, 20))
 
-        # Initialize combobox with display name of current provider
+        # Initialize combobox with display name from config
         current_internal_name = self.setting_vars['llm_provider'].get()
         self.llm_provider_combo.set(self.llm_provider_name_map[current_internal_name])
 
@@ -163,6 +166,9 @@ class SettingsFrame(ttk.Frame):
         # Container for provider-specific settings
         self.provider_settings_frame = ttk.Frame(frame)
         self.provider_settings_frame.pack(fill='x')
+
+        # Initialize default provider-specific settings
+        self.show_provider_settings()
 
         def on_provider_selected(event):
             # Map display name to internal name
@@ -173,9 +179,7 @@ class SettingsFrame(ttk.Frame):
             # Update to provider-specific settings
             self.show_provider_settings()
 
-        # Initialize default provider-specific settings
-        self.show_provider_settings()
-        # Bind combobox selection event
+        # Update StringVar and show provider-specific settings when combobox is changed
         self.llm_provider_combo.bind('<<ComboboxSelected>>', on_provider_selected)
 
     def show_provider_settings(self, event=None):
@@ -259,8 +263,48 @@ class SettingsFrame(ttk.Frame):
         else:
             messagebox.showerror("Error", message)
 
+    def create_naming_rules_section(self):
+        """Create naming rules section to configure naming rules"""
+        # Main naming rules frame
+        frame = ttk.LabelFrame(self.content_frame, text="Naming Rules")
+        frame.pack(fill='x')
+
+        # Create file naming language label
+        ttk.Label(frame, text="File Naming Language").pack(pady=(20,5))
+
+        # Internal-display name mapping for naming languages
+        self.naming_language_name_map = {
+            "en": "English",
+            "zh-Hans": "Chinese (Simplified)"
+        }
+
+        # Create combobox for file naming language
+        self.naming_language_combo = ttk.Combobox(
+            frame,
+            width=62,
+            state='readonly'
+        )
+
+        # Show display name in combobox
+        self.naming_language_combo['values'] = [self.naming_language_name_map[lang] for lang in self.naming_language_name_map]
+        self.naming_language_combo.pack(pady=(5, 20))
+
+        # Initialize combobox with display name from config
+        current_internal_name = self.setting_vars['naming_language'].get()
+        self.naming_language_combo.set(self.naming_language_name_map[current_internal_name])
+
+        def on_naming_language_selected(event):
+            # Map display name to internal name
+            selected_display_name = self.naming_language_combo.get()
+            selected_internal_name = next(k for k, v in self.naming_language_name_map.items() if v == selected_display_name)
+            # Store internal name to StringVar
+            self.setting_vars['naming_language'].set(selected_internal_name)
+        
+        # Update StringVar when combobox is changed
+        self.naming_language_combo.bind('<<ComboboxSelected>>', on_naming_language_selected)
+
     def create_about_section(self):
-        """Create about section with improved typography and layout"""
+        """Create about section to show general information about the application"""
         # Main about frame
         frame = ttk.LabelFrame(self.content_frame, text="About")
         frame.pack(fill='x')

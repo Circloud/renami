@@ -32,7 +32,8 @@ class Settings:
                         "doubao_model": "doubao-1-5-vision-pro-32k-250115",
                         "openai_compatible_api_key": "",
                         "openai_compatible_api_base_url": "",
-                        "openai_compatible_model": ""
+                        "openai_compatible_model": "",
+                        "naming_language": "en"
                     }
                     with open(self.config_file, 'w') as f:
                         json.dump(config_template, f, indent=4)
