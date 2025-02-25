@@ -59,7 +59,8 @@ class SettingsFrame(ttk.Frame):
             'openai_compatible_api_base_url': StringVar(value=settings.get('openai_compatible_api_base_url')),
             'openai_compatible_model': StringVar(value=settings.get('openai_compatible_model')),
             'naming_language': StringVar(value=settings.get('naming_language')),
-            'naming_convention': StringVar(value=settings.get('naming_convention'))
+            'naming_convention': StringVar(value=settings.get('naming_convention')),
+            'custom_instruction': StringVar(value=settings.get('custom_instruction')),
         }
         
         # Add trace to variables
@@ -320,10 +321,10 @@ class SettingsFrame(ttk.Frame):
         for widget in self.naming_language_settings_frame.winfo_children():
             widget.destroy()
 
+        # Show the language-specific settings frame
+        self.naming_language_settings_frame.pack(fill='x')
+
         if naming_language == 'en':
-            # Show the language-specific settings frame
-            self.naming_language_settings_frame.pack(fill='x')
-            
             self.naming_convention_map = {
                 "with-spaces": "With Spaces",
                 "pascal-case": "PascalCase",
@@ -358,10 +359,15 @@ class SettingsFrame(ttk.Frame):
                 self.setting_vars['naming_convention'].set(selected_internal_name)
 
             self.naming_convention_combo.bind('<<ComboboxSelected>>', on_naming_convention_selected)
-            
-        elif naming_language == 'zh-Hans':
-            # Hide language-specific settings frame
-            self.naming_language_settings_frame.pack_forget()
+
+        # Add custom instruction section after naming convention settings
+        ttk.Label(self.naming_language_settings_frame, text="Custom Instruction").pack()
+        self.custom_instruction_entry = ttk.Entry(
+            self.naming_language_settings_frame,
+            width=65,
+            textvariable=self.setting_vars['custom_instruction']
+        )
+        self.custom_instruction_entry.pack(pady=(5, 20))
 
     def create_about_section(self):
         """Create about section to show general information about the application"""

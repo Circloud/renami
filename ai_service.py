@@ -85,6 +85,7 @@ class AIService:
         llm_provider = self.settings.get('llm_provider')
         naming_language = self.settings.get('naming_language')
         naming_convention = self.settings.get('naming_convention')
+        custom_instruction = self.settings.get('custom_instruction')
 
         if naming_language == 'en':
             if naming_convention == 'with-spaces':
@@ -112,6 +113,8 @@ class AIService:
         4. Avoid using any invalid characters in new file name.
         5. Use {naming_language} for naming the file.
         6. Follow the naming convention: {naming_convention_prompt}
+        ---
+        Custom Instruction: {custom_instruction}
         """
 
         user_prompt = f"Please suggest a new file name (without extension) based on the following file content: {file_content}"

@@ -34,7 +34,8 @@ class Settings:
                         "openai_compatible_api_base_url": "",
                         "openai_compatible_model": "",
                         "naming_language": "en",
-                        "naming_convention": "with-spaces"
+                        "naming_convention": "with-spaces",
+                        "custom_instruction": ""
                     }
                     with open(self.config_file, 'w') as f:
                         json.dump(config_template, f, indent=4)
